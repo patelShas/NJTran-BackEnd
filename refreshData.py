@@ -39,7 +39,3 @@ def getCurrentToken():
             return tokens[today]
         else:
             raise Exception("No token found for today's date. Please call updateToken() to get a new token.")
-    
-#getToken()
-#updateToken()
-print(getCurrentToken())
