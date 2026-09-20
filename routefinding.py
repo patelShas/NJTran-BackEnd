@@ -1,29 +1,25 @@
 import csv
 import pandas as pd
 from datetime import date
+from pathlib import Path
 
-filename_trips = ".\getGTFS\\trips.csv"  # File name
-file_name_schedule = ".\getGTFS\\calendar_dates.csv"
+DATA_DIR = Path("GTFS_data")
+filename_trips = DATA_DIR / "trips.txt"  # File name
+file_name_schedule = DATA_DIR / "calendar_dates.txt"
 fields = []  # Column names
 rows = []  # Data rows
 
 def get_current_date() -> str:
-    today = date.today()
-    curr_year = str(today.year)
-    curr_month = str(today.month)
-    if len(curr_month) < 2:
-        curr_month = "0" + curr_month
-    curr_day = str(today.day)
-    curr_date = curr_year + curr_month + curr_day
-    return curr_date
+    return date.today().strftime("%Y%m%d")
 
-print(get_current_date())
 
-exit()
-schedule = pd.read_csv(file_name_schedule)
-curr_services = schedule[schedule["date"] == int(curr_date)]
+def get_trips_for_date(date_str: str) -> pd.DataFrame:
+    schedule = pd.read_csv(file_name_schedule)
+    # exception_type 1 = service added on this date, 2 = service removed
+    curr_calendar_dates = schedule[
+        (schedule["date"] == int(date_str)) & (schedule["exception_type"] == 1)
+    ]
+    trips = pd.read_csv(filename_trips)
+    curr_trips = trips[trips["service_id"].isin(curr_calendar_dates["service_id"])]
+    return curr_trips
 
-trips = pd.read_csv(filename_trips)
-print(f"there are {len(trips)} trips")
-main_line_trips = trips[trips["route_id"] == 6]
-print(f"{len(main_line_trips)} of those are on the main line")
