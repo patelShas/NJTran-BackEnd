@@ -1,11 +1,10 @@
 import csv
 import pandas as pd
 from datetime import date
-from pathlib import Path
+from njtran_backend.paths import GTFS_DATA_DIR
 
-DATA_DIR = Path("GTFS_data")
-filename_trips = DATA_DIR / "trips.txt"  # File name
-file_name_schedule = DATA_DIR / "calendar_dates.txt"
+filename_trips = GTFS_DATA_DIR / "trips.txt"  # File name
+file_name_schedule = GTFS_DATA_DIR / "calendar_dates.txt"
 fields = []  # Column names
 rows = []  # Data rows
 
@@ -32,5 +31,12 @@ Each leg should be able to map to two rows in stop_times.txt.
 One row whose trip_id, arrival_time, and stop_id are the same as the leg's trip, start_time and start_stop values.
 And another whose trip_id, arrival_time, and stop_id are the same as the leg's trip, end_time and end_stop values.
 If there is more than 1 leg in the path, each leg's end time and end stop should be the same value as the next leg's start_time and start_stop values
+
+I want to know the last possible route. As an example, what is the last possible route from harriman station to secaucus (identified by stop_id) on 
+
 '''
+
+print(get_current_date())
+
+
 

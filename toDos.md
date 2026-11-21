@@ -12,3 +12,7 @@
    if I give you my start, tell me where I can go.
 
 Setup a database connection to these text files
+
+# MVP
+
+For now we will just return the last possible route to reach a destination

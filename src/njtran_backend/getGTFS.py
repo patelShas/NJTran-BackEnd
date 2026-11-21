@@ -2,13 +2,14 @@ import zipfile
 import requests
 import os
 from datetime import date
-from refreshData import getCurrentToken, updateToken
+from njtran_backend.refreshData import getCurrentToken, updateToken
+from njtran_backend.paths import GTFS_DATA_DIR, GTFS_ARCHIVE_DIR
 
 
 # This returns Rail GTFS schedule data in ZIP format.
 
 
-def getGTFS(save_path="gtfs_data.zip"):
+def getGTFS(save_path):
     # Check if file already exists
     if os.path.exists(save_path):
         raise FileExistsError(f"{save_path} already exists")
@@ -34,22 +35,24 @@ def getGTFS(save_path="gtfs_data.zip"):
         print(f"Error: {response.status_code}")
         
 def data_refresh():
-    # delete old GTFS data from folder GTFS_data
-    if os.path.exists("GTFS_data"):
-        for file in os.listdir("GTFS_data"):
-            os.remove(os.path.join("GTFS_data", file))
-            
-    # get new GTFS data
+    # get new GTFS data first, so a failed download doesn't leave GTFS_data empty
     today = str(date.today())
-    gtfs_zip_path = f"GTFS_data_archive/gtfs_data_{today}.zip"
+    gtfs_zip_path = GTFS_ARCHIVE_DIR / f"gtfs_data_{today}.zip"
     # check if GTFS data for today's date already exists in GTFS_data_archive
     if os.path.exists(gtfs_zip_path):
         print("GTFS data for today's date already exists in GTFS_data_archive")
     else:
         getGTFS(save_path=gtfs_zip_path)
+    if not os.path.exists(gtfs_zip_path):
+        raise RuntimeError("GTFS download failed; keeping existing GTFS_data")
+
+    # delete old GTFS data from folder GTFS_data
+    if GTFS_DATA_DIR.exists():
+        for file in GTFS_DATA_DIR.iterdir():
+            file.unlink()
 
     # unzip the GTFS data and save it in the GTFS_data folder
     with zipfile.ZipFile(gtfs_zip_path, "r") as zip_ref:
-        zip_ref.extractall("GTFS_data")
+        zip_ref.extractall(GTFS_DATA_DIR)
         
 data_refresh()
